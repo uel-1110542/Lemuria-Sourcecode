@@ -18,7 +18,7 @@ public class TL_ProtrudeSpike : MonoBehaviour {
         FadingCooldown += Time.realtimeSinceStartup;
 
         //Finds the child gameobject
-        Spike = transform.FindChild("Spike").gameObject;
+        Spike = transform.Find("Spike").gameObject;
 
         //Obtains the color component from the renderer
 		StartingColor = transform.gameObject.GetComponent<Renderer>().material.color;

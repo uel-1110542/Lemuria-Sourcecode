@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class TL_SpecialEffect : MonoBehaviour {
 
@@ -23,7 +22,7 @@ public class TL_SpecialEffect : MonoBehaviour {
         if (PC != null && PC.name == "Wu(Clone)" && IsEnemyStunned)
         {
             //Obtain the script from the NPC
-            TL_NPCMovement NPCScript = GameObject.FindGameObjectWithTag("NPC").GetComponent<TL_NPCMovement>();
+            TL_NPCBehaviour NPCScript = GameObject.FindGameObjectWithTag("NPC").GetComponent<TL_NPCBehaviour>();
 
             //Reduce the cooldown
             Cooldown -= Time.deltaTime;

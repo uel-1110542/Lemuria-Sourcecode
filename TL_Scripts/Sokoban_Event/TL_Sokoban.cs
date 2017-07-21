@@ -93,7 +93,7 @@ public class TL_Sokoban : MonoBehaviour {
             for (int z = 0; z < GridScript.ReturnLevelAreaArray().GetLength(1); z++)
             {
                 //Spawn the platform
-                GameObject PlatformClone = (GameObject) Instantiate(GridScript.Platform, new Vector3(x, 0f, z), Quaternion.identity);
+                GameObject PlatformClone = Instantiate(GridScript.Platform, new Vector3(x, 0f, z), Quaternion.identity);
 
                 //Set the rotation
                 PlatformClone.transform.localEulerAngles = new Vector3(90f, 0f, 0f);

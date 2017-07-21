@@ -5,7 +5,8 @@ public class TL_CheckPlacement : MonoBehaviour {
     //Variable
     public bool CorrectPlace;
     private TL_PushObject MovableObjScript;
-    
+
+
 
     void OnTriggerStay(Collider obj)
     {
@@ -15,7 +16,7 @@ public class TL_CheckPlacement : MonoBehaviour {
             //Obtain the script from the collided object
             MovableObjScript = obj.gameObject.GetComponent<TL_PushObject>();
 
-            //If the moved object is not moving then set the bool to true
+            //If the moved object is not moving, set the bool to true
             if (!MovableObjScript.Moving)
             {
                 CorrectPlace = true;

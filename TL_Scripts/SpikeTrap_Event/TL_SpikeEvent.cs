@@ -19,6 +19,8 @@ public class TL_SpikeEvent : MonoBehaviour {
     private TL_PC_World_Movement WorldMovementScript;
     private TL_GridManager GridScript;
 
+
+
     void Start()
     {
         //Finds the gameobject and obtains the script
@@ -78,7 +80,7 @@ public class TL_SpikeEvent : MonoBehaviour {
         BoxCollider ExitCollider = GridScript.ReturnGOInLevelArea(14, 4).AddComponent<BoxCollider>();
 
         //Set default size and center
-        ExitCollider.size = new Vector3(1f, 1f, 0.5f);
+        ExitCollider.size = new Vector3(0.8f, 0.8f, 0.5f);
         ExitCollider.center = new Vector3(0f, 0f, -0.25f);
 
         //Set the trigger

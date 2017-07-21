@@ -8,9 +8,6 @@ public class TL_FollowChar : MonoBehaviour {
     public GameObject Character;
     public GameObject Box;
 
-    private TL_PushObject ObjScript;    
-    private bool OnTheBox = false;
-
 
 
 	void Update()
@@ -40,14 +37,9 @@ public class TL_FollowChar : MonoBehaviour {
 			PCScript.NPC_Detected = true;
 		}
 
+        //If the collided gameobject has the moveable object tag
         if (col.tag == "MovableObj")
         {
-            //Obtain the script from the box
-            ObjScript = col.GetComponent<TL_PushObject>();
-
-            //Set the bool to true
-            OnTheBox = true;
-
             //Make the collided gameobject equal to this gameobject variable
             Box = col.gameObject;
         }
@@ -64,11 +56,9 @@ public class TL_FollowChar : MonoBehaviour {
 			PCScript.NPC_Detected = false;
 		}
 
+        //If the collided gameobject has the moveable object tag
         if (col.tag == "MovableObj")
         {
-            //Set the bool to false
-            OnTheBox = false;
-
             //Make the gameobject variable null
             Box = null;
         }

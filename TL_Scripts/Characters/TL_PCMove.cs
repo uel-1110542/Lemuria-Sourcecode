@@ -13,9 +13,7 @@ public class TL_PCMove : MonoBehaviour {
 
     private TL_MoveScript MoveScript;
 	private TL_MoveScript NPCMoveScript;
-	private TL_NPCMovement NPC_AI_Script;
 	private TL_CharStats CharacterScript;
-    private TL_ActiveTimeBattle CombatManagerScript;
     private TL_GridManager GridScript;
     private TL_RaycastSelection SelectionScript;
     private int MovementPresses;
@@ -51,80 +49,68 @@ public class TL_PCMove : MonoBehaviour {
             //If the selected gameobject has the tag Offset
             if (SelectionScript.ReturnSelectedGO().transform.tag == "Offset")
             {
-                //Obtain the script from the level area
-                CombatManagerScript = LevelArea.GetComponent<TL_ActiveTimeBattle>();
-
-                //Obtain the script from the movement box
-                TL_MoveOffset MoveOffsetScript = SelectionScript.ReturnSelectedGO().transform.gameObject.GetComponent<TL_MoveOffset>();
+                //Calculate the distance between where the player is clicking and the PC's position
+                float MoveDist = (Mathf.Round(transform.position.x) - Mathf.Round(SelectionScript.ReturnSelectedGO().transform.position.x));
 
                 //Find all the NPCs
                 GameObject[] NPCs = GameObject.FindGameObjectsWithTag("NPC");
-
+                
                 //Loop through all of the NPCs in the scene
                 foreach (GameObject go in NPCs)
                 {
-                    //Calculate the X distance of the PC and the closest NPC
+                    //Calculate the X and Z distance of the PC and the closest NPC
                     float X_Dist = (Mathf.Round(transform.position.x) - Mathf.Round(go.transform.position.x));
-
-                    //If the NPC is not dead
-                    if (go != null)
+                    float Z_Dist = (Mathf.Round(transform.position.z) - Mathf.Round(go.transform.position.z));
+                    
+                    //If the distance of X is more than 1, flip the sprite, if not, don't flip it
+                    if (X_Dist >= 1)
                     {
-                        //If the distance of X is more than 1, flip the sprite, if not, don't flip it
-                        if (X_Dist >= 1)
+                        GetComponent<SpriteRenderer>().flipX = true;
+                    }
+                    else
+                    {
+                        GetComponent<SpriteRenderer>().flipX = false;
+                    }
+
+                    //If the PC is Zofia
+                    if (transform.name == "Zofia(Clone)")
+                    {
+                        //If the player has clicked in front of the PC and the NPC
+                        if (MoveDist == -1 && X_Dist == -2 && Z_Dist == 0 || MoveDist == 1 && X_Dist == 2 && Z_Dist == 0)
                         {
-                            GetComponent<SpriteRenderer>().flipX = true;
+                            //If the NPC is not dead
+                            if (go != null)
+                            {
+                                //Attack the NPC and deal damage
+                                AttackNPC(go);
+                            }
                         }
                         else
                         {
-                            GetComponent<SpriteRenderer>().flipX = false;
+                            //Update the movement grid
+                            UpdateMovementGrid();
                         }
-
-                        //If the PC is not grabbed by the NPC
-                        if (!GrabbedByNPC)
-                        {
-                            //If an enemy is detected
-                            if (NPC_Detected)
-                            {
-                                //If the distance of X is more or less than 1
-                                if (X_Dist == 1 || X_Dist == -1)
-                                {
-                                    //If the closest NPC is not dead and the player has pressed the mouse down
-                                    if (Input.GetMouseButtonDown(0))
-                                    {
-                                        //Obtain the sprite renderer from the closest NPC
-                                        SpriteRenderer NPC_Sprite = go.GetComponent<SpriteRenderer>();
-
-                                        //Start the corountine for flashing the sprite
-                                        StartCoroutine(SpriteFlash(NPC_Sprite));
-
-                                        //A variable to store the value of the PC attack value
-                                        int PC_Attack = GetComponent<TL_CharStats>().AttackValue;
-
-                                        //Obtains the script from the NPC gameobject
-                                        CharacterScript = go.GetComponent<TL_CharStats>();
-
-                                        //Input the gameobject receiving the damage with the function
-                                        CharacterScript.ReceiveDamage(go, PC_Attack);
-                                    }
-                                }
-                            }
-                            else if (GridScript.ReturnGOInLevelArea((int)Mathf.Round(SelectionScript.ReturnSelectedGO().transform.position.x), (int)Mathf.Round(SelectionScript.ReturnSelectedGO().transform.position.z)) == null)
-                            {
-                                //Sets its' previous position in the grid to be null
-                                GridScript.SetGOInLevelArea(null, (int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
-
-                                //Set the target X and Z positions to the X and Z positions obtained from the grid offsets
-                                transform.position = Vector3.MoveTowards(transform.position, new Vector3(MoveOffsetScript.X_Offset, 0.1f, MoveOffsetScript.Z_Offset), 5f);
-
-                                //Assigns its' current position after moving into the grid
-                                GridScript.SetGOInLevelArea(transform.gameObject, (int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
-                            }
-                        }
-
                     }
-
+                    else if (transform.name == "Vadinho(Clone)")        //If the PC is Vadinho
+                    {
+                        //If the player has clicked in front of or behind the PC and the NPC
+                        if (MoveDist == 1 && X_Dist == 1 && Z_Dist >= -1 && Z_Dist <= 1 || 
+                            MoveDist == -1 && X_Dist == -1 && Z_Dist >= -1 && Z_Dist <= 1)
+                        {
+                            //If the NPC is not dead
+                            if (go != null)
+                            {
+                                //Attack the NPC and deal damage
+                                AttackNPC(go);
+                            }
+                        }
+                        else
+                        {
+                            //Update the movement grid
+                            UpdateMovementGrid();
+                        }                        
+                    }                    
                 }
-                
             }
 
             if (SelectionScript.ReturnSelectedGO().transform.name != "Wall(Clone)" && !MoveScript.IsCharMoving)
@@ -147,11 +133,52 @@ public class TL_PCMove : MonoBehaviour {
                     MoveScript.TargetPos.x = Mathf.Round(SelectionScript.ReturnRaycastHit().point.x);
                     MoveScript.TargetPos.z = Mathf.Round(SelectionScript.ReturnRaycastHit().point.z);
                 }
-
             }
-
         }
+    }
 
+    void UpdateMovementGrid()
+    {
+        //Obtain the script from the movement box
+        TL_MoveOffset MoveOffsetScript = SelectionScript.ReturnSelectedGO().GetComponent<TL_MoveOffset>();
+
+        if (GridScript.ReturnGOInLevelArea((int)Mathf.Round(SelectionScript.ReturnSelectedGO().transform.position.x), (int)Mathf.Round(SelectionScript.ReturnSelectedGO().transform.position.z)) == null)
+        {
+            //Sets its' previous position in the grid to be null
+            GridScript.SetGOInLevelArea(null, (int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
+
+            //Set the target X and Z positions to the X and Z positions obtained from the grid offsets
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(MoveOffsetScript.X_Offset, 0.1f, MoveOffsetScript.Z_Offset), 5f);
+
+            //Assigns its' current position after moving into the grid
+            GridScript.SetGOInLevelArea(transform.gameObject, (int)Mathf.Round(transform.position.x), (int)Mathf.Round(transform.position.z));
+        }
+    }
+
+    void AttackNPC(GameObject go)
+    {
+        //If the PC is not grabbed by the NPC
+        if (!GrabbedByNPC)
+        {
+            //If the closest NPC is not dead and the player has pressed the mouse down
+            if (Input.GetMouseButtonDown(0))
+            {
+                //Obtain the sprite renderer from the closest NPC
+                SpriteRenderer NPC_Sprite = go.GetComponent<SpriteRenderer>();
+
+                //Start the corountine for flashing the sprite
+                StartCoroutine(SpriteFlash(NPC_Sprite));
+
+                //A variable to store the value of the PC attack value
+                int PC_Attack = GetComponent<TL_CharStats>().AttackValue;
+
+                //Obtains the script from the NPC gameobject
+                CharacterScript = go.GetComponent<TL_CharStats>();
+
+                //Input the gameobject receiving the damage with the function
+                CharacterScript.ReceiveDamage(go, PC_Attack);
+            }
+        }
     }
 
     public IEnumerator SpriteFlash(SpriteRenderer Sprite)

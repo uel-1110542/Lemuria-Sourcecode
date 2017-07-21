@@ -3,23 +3,20 @@ using System.Collections;
 
 public class TL_AnimateSpikes : MonoBehaviour {
 
-    private Animator Spike_Anim;
 
-	private float RateOfFading = 0.075f;
-	private float FadingCooldown;
-	private float RateOfActivation = 0.025f;
-    
-    private Color Opacity;
-    private bool DetractSpike = false;
     public bool AreSpikesActivated = false;
     public bool TriggerSpikeAnim = false;
-	public int CurrentIndex;
+    private Animator Spike_Anim;
+	private float RateOfFading = 0.075f;
+	private float FadingCooldown;    
+    private Color Opacity;
+
 
 
 	void Start()
 	{
 		//Add cooldown to prevent spikes to instantly protrude
-		FadingCooldown = RateOfFading + Time.realtimeSinceStartup;
+		FadingCooldown = RateOfFading + Time.time;
 
         //Obtain the animator component from this gameobject
         Spike_Anim = gameObject.GetComponent<Animator>();
@@ -36,8 +33,8 @@ public class TL_AnimateSpikes : MonoBehaviour {
 		//Set the color to default
 		Opacity = transform.gameObject.GetComponent<SpriteRenderer>().color;
 
-		//If the cooldown is less than the time since startup and the spike isn't triggered
-		if(FadingCooldown < Time.realtimeSinceStartup && !TriggerSpikeAnim)
+		//If the cooldown is less than the time and the spike isn't triggered
+		if(FadingCooldown < Time.time && !TriggerSpikeAnim)
 		{
 			//Increase alpha channel
 			Opacity.a += 2f * Time.deltaTime;
@@ -53,18 +50,18 @@ public class TL_AnimateSpikes : MonoBehaviour {
 			transform.gameObject.GetComponent<SpriteRenderer>().color = Opacity;
 
 			//Adds the cooldown
-			FadingCooldown = RateOfFading + Time.realtimeSinceStartup;
+			FadingCooldown = RateOfFading + Time.time;
 		}
 
 	}
 
 	IEnumerator AnimateSpike()
 	{
-        //Wait for 1 seconds
-        yield return new WaitForSeconds(0.17f);
+        //Wait for 0.15 seconds
+        yield return new WaitForSeconds(0.15f);
 
-        //Enable the animation
-        Spike_Anim.enabled = false;
+        //Freeze the animation
+        Spike_Anim.speed = 0;
 
         //Set the bool to true
         AreSpikesActivated = true;
@@ -72,8 +69,8 @@ public class TL_AnimateSpikes : MonoBehaviour {
         //Wait for 2 seconds
         yield return new WaitForSeconds(2f);
 
-        //Enable the animation
-        Spike_Anim.enabled = true;
+        //Resume the animation
+        Spike_Anim.speed = 1;
 
         //Set the trigger
         Spike_Anim.SetTrigger("RetractSpikes");
@@ -81,8 +78,8 @@ public class TL_AnimateSpikes : MonoBehaviour {
         //Set the bool to false
         AreSpikesActivated = false;
 
-        //Wait for 1 seconds
-        yield return new WaitForSeconds(0.17f);
+        //Wait for 0.15 seconds
+        yield return new WaitForSeconds(0.15f);
 
         //Restart the animation
         Spike_Anim.SetTrigger("Restart");

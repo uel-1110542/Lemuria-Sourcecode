@@ -28,7 +28,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
     private float Z_Offset;
 
     private TL_FollowChar BoxScript;
-	private TL_NPCMovement NPC_Script;
+	private TL_NPCBehaviour NPC_Script;
     private TL_SpawnPC PCSpawnScript;
     private TL_PC_World_Movement WorldMovementScript;
     private TL_GridManager GridScript;
@@ -144,10 +144,10 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
         GridScript.ReturnLevelAreaArray()[5, 1].transform.eulerAngles = new Vector3(90f, 0f, 0f);
 
         //If the NPC has the movement script
-        if (GridScript.ReturnLevelAreaArray()[5, 1].GetComponent<TL_NPCMovement>() != null)
+        if (GridScript.ReturnLevelAreaArray()[5, 1].GetComponent<TL_NPCBehaviour>() != null)
         {
             //Obtains the script from the NPC
-            NPC_Script = GridScript.ReturnLevelAreaArray()[5, 1].GetComponent<TL_NPCMovement>();
+            NPC_Script = GridScript.ReturnLevelAreaArray()[5, 1].GetComponent<TL_NPCBehaviour>();
 
             //Enables the script
             NPC_Script.enabled = true;
@@ -158,13 +158,13 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 			for(int z = 0; z < LevelMovement.GetLength(1); z++)
 			{
                 //Spawn the platform
-                GameObject PlatformClone = (GameObject) Instantiate (GridScript.Platform, new Vector3(x, 0, z), Quaternion.identity);
+                GameObject PlatformClone = Instantiate (GridScript.Platform, new Vector3(x, 0, z), Quaternion.identity);
 
                 //Change the sprite according to the region selected
                 GridScript.SetBiomeSprites(PlatformClone, WorldMovementScript.WorldMapDataClass.Region_Name);
 
                 //Instantiates the movement squares and sets it to the 2D gameobject array depending on the for loops
-                LevelMovement[x, z] = (GameObject) Instantiate (MovementSquare, new Vector3(x, 0.1f, z), Quaternion.identity);
+                LevelMovement[x, z] = Instantiate (MovementSquare, new Vector3(x, 0.1f, z), Quaternion.identity);
 
                 //Obtains the script from the 2D gameobject array
                 TL_MoveOffset OffsetScript = LevelMovement[x, z].GetComponent<TL_MoveOffset>();
@@ -204,7 +204,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 			    Z_Offset = 1f;
 
                 //Instantiates the special hitbox
-			    Special_HitboxClone = (GameObject)Instantiate (Special_HitBox, new Vector3 (1f, 0.15f, 1f), Quaternion.identity);
+			    Special_HitboxClone = Instantiate (Special_HitBox, new Vector3 (1f, 0.15f, 1f), Quaternion.identity);
 
                 //Enables the box collider
                 Special_HitboxClone.GetComponent<BoxCollider>().enabled = false;
@@ -218,7 +218,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 			    //Instantiates the hitboxes with a for loop
 			    for (int i = -1; i < 2; i++)
 			    {
-				    HitboxClone = (GameObject)Instantiate(HitBox, new Vector3(PC.transform.position.x + X_Offset, 0.15f, PC.transform.position.z + i), Quaternion.identity);
+				    HitboxClone = Instantiate(HitBox, new Vector3(PC.transform.position.x + X_Offset, 0.15f, PC.transform.position.z + i), Quaternion.identity);
 				    HitboxClone.transform.localEulerAngles = new Vector3 (90f, 0f, 0f);
 
                     //Obtain the script from the special hitbox
@@ -234,7 +234,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 
                 for (int i = -1; i < 2; i++)
                 {
-                    HitboxClone = (GameObject)Instantiate(HitBox, new Vector3(PC.transform.position.x - X_Offset, 0.15f, PC.transform.position.z + i), Quaternion.identity);
+                    HitboxClone = Instantiate(HitBox, new Vector3(PC.transform.position.x - X_Offset, 0.15f, PC.transform.position.z + i), Quaternion.identity);
                     HitboxClone.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
                     //Obtain the script from the special hitbox
@@ -255,9 +255,9 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 			    Z_Offset = 2f;
 
                 //Instantiates the hitbox
-                HitboxClone = (GameObject)Instantiate(HitBox, new Vector3(PC.transform.position.x + 2f, 0.15f, PC.transform.position.z), Quaternion.identity);
+                HitboxClone = Instantiate(HitBox, new Vector3(PC.transform.position.x + 2f, 0.15f, PC.transform.position.z), Quaternion.identity);
 			    HitboxClone.transform.localEulerAngles = new Vector3 (90f, 0f, 0f);
-
+                
                 //Enables the box collider
                 BoxScript = HitboxClone.GetComponent<TL_FollowChar>();
 
@@ -268,10 +268,23 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
                 //Assigns the character variable as the PC
                 BoxScript.Character = PC;
 
+                HitboxClone = Instantiate(HitBox, new Vector3(PC.transform.position.x - 2f, 0.15f, PC.transform.position.z), Quaternion.identity);
+                HitboxClone.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
+
+                //Enables the box collider
+                BoxScript = HitboxClone.GetComponent<TL_FollowChar>();
+
+                //Sets the X and Z offsets for the hitboxes
+                BoxScript.X_Pos = -2f;
+                BoxScript.Z_Pos = 0f;
+
+                //Assigns the character variable as the PC
+                BoxScript.Character = PC;
+
                 //Instantiates the special hitboxes
                 for (int i = -1; i < 2; i++)
 			    {
-				    Special_HitboxClone = (GameObject)Instantiate (Special_HitBox, new Vector3 (PC.transform.position.x + X_Offset, PC.transform.position.y, PC.transform.position.z + i), Quaternion.identity);
+				    Special_HitboxClone = Instantiate (Special_HitBox, new Vector3 (PC.transform.position.x + X_Offset, PC.transform.position.y, PC.transform.position.z + i), Quaternion.identity);
 
                     //Disable the box collider
                     Special_HitboxClone.GetComponent<BoxCollider>().enabled = false;
@@ -289,7 +302,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 
                 for (int i = -1; i < 2; i++)
                 {
-                    Special_HitboxClone = (GameObject)Instantiate(Special_HitBox, new Vector3(PC.transform.position.x - X_Offset, PC.transform.position.y, PC.transform.position.z + i), Quaternion.identity);
+                    Special_HitboxClone = Instantiate(Special_HitBox, new Vector3(PC.transform.position.x - X_Offset, PC.transform.position.y, PC.transform.position.z + i), Quaternion.identity);
 
                     //Disable the box collider
                     Special_HitboxClone.GetComponent<BoxCollider>().enabled = false;
@@ -312,7 +325,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
 			    Z_Offset = 1;
 
                 //Instantiates the hitbox
-                Special_HitboxClone = (GameObject)Instantiate(Special_HitBox, new Vector3(PC.transform.position.x, PC.transform.position.y, PC.transform.position.z + Z_Offset), Quaternion.identity);
+                Special_HitboxClone = Instantiate(Special_HitBox, new Vector3(PC.transform.position.x, PC.transform.position.y, PC.transform.position.z + Z_Offset), Quaternion.identity);
             
                 //Instantiates the special hitbox
                 Special_HitboxClone.GetComponent<BoxCollider>().enabled = false;
@@ -367,7 +380,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
                     if (x != 0)
                     {
                         //Spawn the enemy hitbox
-                        Enemy_Hitbox = (GameObject)Instantiate(Melee_Hitbox, new Vector3(transform.position.x + x, 0f, NPC.transform.position.z + 1f), Quaternion.identity);
+                        Enemy_Hitbox = Instantiate(Melee_Hitbox, new Vector3(transform.position.x + x, 0f, NPC.transform.position.z + 1f), Quaternion.identity);
                         Enemy_Hitbox.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
                         //Obtain the enemy hitbox
@@ -387,7 +400,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
                     if (z != 0)
                     {
                         //Spawn the enemy hitbox
-                        Enemy_Hitbox = (GameObject)Instantiate(Melee_Hitbox, new Vector3(transform.position.x + X_Offset, 0f, transform.position.z + z), Quaternion.identity);
+                        Enemy_Hitbox = Instantiate(Melee_Hitbox, new Vector3(transform.position.x + X_Offset, 0f, transform.position.z + z), Quaternion.identity);
                         Enemy_Hitbox.transform.localEulerAngles = new Vector3(90f, 0f, 0f);
 
                         //Obtain the enemy hitbox
@@ -492,7 +505,7 @@ public class TL_ActiveTimeBattle : MonoBehaviour {
         if (NPC != null)
         {
             //Obtain the script from the NPC
-            NPC_Script = NPC.GetComponent<TL_NPCMovement>();
+            NPC_Script = NPC.GetComponent<TL_NPCBehaviour>();
         }
 
         for (int x = 0; x < LevelMovement.GetLength(0); x++)

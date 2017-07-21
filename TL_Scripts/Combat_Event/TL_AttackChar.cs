@@ -8,14 +8,14 @@ public class TL_AttackChar : MonoBehaviour {
     private GameObject PC;
     private GameObject NPC;
     private TL_CharStats CharacterScript;
-    private TL_NPCMovement NPCScript;
+    private TL_NPCBehaviour NPCScript;
 
 
 
     void Start()
     {
         //Adds the cooldowns so the NPC doesn't react immediately
-        AttackCooldown = AttackRate + Time.realtimeSinceStartup;
+        AttackCooldown = AttackRate + Time.time;
     }
     
     void OnTriggerStay(Collider Col)
@@ -28,7 +28,7 @@ public class TL_AttackChar : MonoBehaviour {
 			if (NPC != null)
 			{
 				//Obtains the script from the NPC
-				NPCScript = NPC.GetComponent<TL_NPCMovement>();
+				NPCScript = NPC.GetComponent<TL_NPCBehaviour>();
                 
                 //Sets the state to Attack
                 NPCScript.SetState("Attack");
@@ -51,7 +51,7 @@ public class TL_AttackChar : MonoBehaviour {
                 CharacterScript.ReceiveDamage(Col.transform.gameObject, NPC_Attack);
                 
                 //Adds the cooldown
-                AttackCooldown = AttackRate + Time.realtimeSinceStartup;
+                AttackCooldown = AttackRate + Time.time;
 			}
             
         }
@@ -64,7 +64,7 @@ public class TL_AttackChar : MonoBehaviour {
         if (Col.transform.tag == "PC")
         {
             //Obtain the script from the NPC
-            NPCScript = GameObject.FindGameObjectWithTag("NPC").GetComponent<TL_NPCMovement>();
+            NPCScript = GameObject.FindGameObjectWithTag("NPC").GetComponent<TL_NPCBehaviour>();
 
             //Set the state to move
             NPCScript.SetState("Move");
